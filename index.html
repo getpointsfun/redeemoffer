@@ -212,6 +212,46 @@
   }
   .staff-field input:focus{ outline:none; border-color: var(--coral); }
 
+  .usage-notice{
+    background: rgba(216,88,105,0.08);
+    border: 1px solid rgba(216,88,105,0.25);
+    border-radius: 6px;
+    padding: 12px 14px;
+    margin-bottom: 20px;
+    font-size: 12px;
+    line-height: 1.7;
+    color: var(--coral);
+  }
+
+  .store-intro{
+    font-size: 13px;
+    line-height: 1.8;
+    color: var(--charcoal);
+    margin: 0 0 16px;
+    padding-bottom: 16px;
+    border-bottom: 1px dashed rgba(43,42,40,0.12);
+  }
+
+  .store-meta{
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.9;
+    margin-bottom: 16px;
+  }
+  .store-meta div{ display:flex; gap: 6px; }
+  .store-meta .meta-label{ flex-shrink:0; color: var(--ink); font-weight:500; }
+
+  .gallery{
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    margin-bottom: 18px;
+    padding-bottom: 4px;
+  }
+  .gallery img{
+    width: 84px; height: 84px; object-fit: cover; border-radius: 6px; flex-shrink:0;
+  }
+
   .not-found{ text-align:center; padding: 50px 26px; }
   .not-found .icon{ font-size: 40px; margin-bottom: 16px; }
   .not-found h2{ font-family:'Noto Serif TC', serif; font-size:19px; color:var(--ink); margin: 0 0 10px; }
@@ -243,197 +283,11 @@
   const LOG_ENDPOINT = "https://script.google.com/macros/s/AKfycbx0_MPtP8vAeWpWe_NzPkUy7I6EQf55nsNvVXqVdPcoSOxkmwKTSGNQls0VLMF8j7zKpw/exec";
 
 /* ============================================================
-   商家與優惠方案資料表（共23筆，已依你最新的試算表整理）
-   -----------------------------------------------------------
-   之後要新增/修改商家，複製一段格式改內容即可。
-   planName 必須和集點樂後台上架的「禮品名稱」逐字一致。
+   商家資料：不再寫死在這個檔案裡，改成讀取同資料夾下的 merchants.json
+   以後要新增/修改商家，只要換掉 merchants.json 這個檔案就好，
+   完全不用碰這支程式碼，也不用重新產生整個網頁。
    ============================================================ */
-  const MERCHANTS = [
-    {
-        "planName": "食伍手作－買一送一",
-        "storeName": "食伍手作",
-        "offerTitle": "明星商品買一送一、民眾參與相關活動即可換馬路糖罐",
-        "offerDesc": "明星商品買一送一、民眾參與相關活動即可換馬路糖罐",
-        "image": "https://drive.google.com/uc?export=view&id=1vzjxNJZ4KFS33OsQ-Oa68UyRGkLjUokk",
-        "website": "https://www.facebook.com/profile.php?id=100072584282138&mibextid=LQQJ4d"
-    },
-    {
-        "planName": "安記食品－買十送一",
-        "storeName": "安記食品",
-        "offerTitle": "全店同價位品項買十送一",
-        "offerDesc": "全店同價位品項買十送一",
-        "image": "https://drive.google.com/uc?export=view&id=1CGwRIMGitWN8G63ykGz6kV2IOgdXTrYi",
-        "website": "https://www.anghi.com.tw"
-    },
-    {
-        "planName": "饅享受－買十送一",
-        "storeName": "饅享受",
-        "offerTitle": "購買造型饅頭10顆再送1顆",
-        "offerDesc": "購買造型饅頭10顆再送1顆",
-        "image": "https://drive.google.com/uc?export=view&id=1ufHCetwyvYUv2rBSw_wGjW9ZUDrNmkt4",
-        "website": "https://portaly.cc/beautybuns?utm_id=97759_v0_s00_e0_tv3"
-    },
-    {
-        "planName": "小輝俠手工愛玉－贈果汁調味",
-        "storeName": "小輝俠手工愛玉",
-        "offerTitle": "贈送免費新鮮果汁調味",
-        "offerDesc": "參與DIY洗愛玉者，將贈送免費新鮮果汁調味（例如：檸檬汁、百香果汁、鳳梨汁……等）",
-        "image": "https://drive.google.com/uc?export=view&id=1YuVtwBcw7bZB9vya2-LO8WcU0OuZIPqn",
-        "website": "https://www.facebook.com/clock821/?locale=zh_TW"
-    },
-    {
-        "planName": "月光下友善農場－全品項95折",
-        "storeName": "月光下友善農場",
-        "offerTitle": "活動期間所有品項九五折",
-        "offerDesc": "活動期間所有品項九五折",
-        "image": "https://drive.google.com/uc?export=view&id=1HgcUZDdWZ4UXn9c4oU5Kof3LYDCrTMar",
-        "website": "https://www.facebook.com/share/1CNDJZC1pL/?mibextid=wwXIfr"
-    },
-    {
-        "planName": "愛思咖啡－咖啡95折加碼",
-        "storeName": "愛思咖啡",
-        "offerTitle": "購買精品濾掛咖啡或浸泡式咖啡享 95折優惠；單筆消費滿 500 元，加贈精選濾掛咖啡 1 包",
-        "offerDesc": "愛思咖啡響應活動，活動期間憑相關參與證明，購買精品濾掛咖啡或浸泡式咖啡享 95折優惠；單筆消費滿 500 元，加贈精選濾掛咖啡 1 包。邀請大家用一杯好咖啡，支持台灣在地烘焙品牌。",
-        "image": "https://drive.google.com/uc?export=view&id=1b17Pa-ulTwJwRPyySK9fZpv6NXX7a4Al",
-        "website": "https://reurl.cc/dmWYY2"
-    },
-    {
-        "planName": "AJ CAFE－咖啡豆9折",
-        "storeName": "AJ CAFE",
-        "offerTitle": "購買咖啡豆享9折優惠、內用手沖咖啡續杯半價",
-        "offerDesc": "購買咖啡豆享9折優惠、內用手沖咖啡續杯半價",
-        "image": "https://drive.google.com/uc?export=view&id=1s33JVjqk7v5V86-9S49lSIMsW5nRiUzf",
-        "website": "https://www.facebook.com/share/g/167h2f9f4SC/"
-    },
-    {
-        "planName": "怪咖咖啡－第二杯半價",
-        "storeName": "怪咖咖啡",
-        "offerTitle": "外帶咖啡同品項第二杯半價",
-        "offerDesc": "外帶咖啡同品項第二杯半價",
-        "image": "https://drive.google.com/uc?export=view&id=1nRitS308-SdPuzR-bA0ItKInxKC4gKlp",
-        "website": "https://www.facebook.com/GuaiCoffeeShop/"
-    },
-    {
-        "planName": "中華麵そば嘉味鮮食堂－滿999送豬排",
-        "storeName": "中華麵そば（嘉味鮮食堂）",
-        "offerTitle": "消費滿999元送豬排一份",
-        "offerDesc": "消費滿999元送豬排一份",
-        "image": "https://drive.google.com/uc?export=view&id=1s9hZXf374PESB15eOrTg_s2-7iCCYDD5",
-        "website": "https://www.facebook.com/share/1B8RnMqXHX/?mibextid=wwXIfr"
-    },
-    {
-        "planName": "森活手作日和－滿300送吊飾",
-        "storeName": "森活手作日和",
-        "offerTitle": "攤位消費滿 300 元，即隨機贈送精美手作毛根小吊飾乙個（數量有限，送完為止）。",
-        "offerDesc": "攤位消費滿 300 元，即隨機贈送精美手作毛根小吊飾乙個（數量有限，送完為止）。",
-        "image": "https://drive.google.com/uc?export=view&id=1h8_RmSxP-QQQGM5od6pjOwDAxVXEfBhk",
-        "website": "https://www.facebook.com/profile.php?id=61559940795658"
-    },
-    {
-        "planName": "HUNGHUNG甜點工作室－贈小蛋糕",
-        "storeName": "HUNGHUNG甜點工作室",
-        "offerTitle": "消費巴斯克一顆送常溫小蛋糕1入",
-        "offerDesc": "消費巴斯克一顆送常溫小蛋糕1入",
-        "image": "https://drive.google.com/uc?export=view&id=136StokqwTBPHZfXWVugeoEFZfzMg1zBb",
-        "website": "https://www.instagram.com/h.hung331/"
-    },
-    {
-        "planName": "草莓小護士手作屋－滿200贈Q餅",
-        "storeName": "草莓小護士手作屋",
-        "offerTitle": "消費滿200、贈手工Q餅",
-        "offerDesc": "鐵蛋、鳥蛋、豆干、米血、甜點…櫃上消費滿200、贈手工Q餅",
-        "image": "https://drive.google.com/uc?export=view&id=1cQhTiPm6nCpToQReEo8VLd62FllOVnUo",
-        "website": "https://www.facebook.com/share/166ydwNkwUs/?mibextid=wwXIfr"
-    },
-    {
-        "planName": "鰻囡仔－蒲燒鰻魚組合",
-        "storeName": "鰻囡仔",
-        "offerTitle": "蒲燒鰻魚3片/1公斤+鮮鰻片1片/330克$1500",
-        "offerDesc": "蒲燒鰻魚3片/1公斤+鮮鰻片1片/330克$1501",
-        "image": "https://drive.google.com/uc?export=view&id=1qYaArmtYaW1Z-MwdoYt4Dg1O3vT6IZBr",
-        "website": "https://www.facebook.com/share/1FQSTV3T9B/?mibextid=wwXIfr"
-    },
-    {
-        "planName": "雲凱農場－黑米買5送1",
-        "storeName": "雲凱農場",
-        "offerTitle": "黑米買5送1，買5包送一包同包裝的",
-        "offerDesc": "黑米買5送1，買5包送一包同包裝的",
-        "image": "https://drive.google.com/uc?export=view&id=17i1P2gCTU9AfvIz2KSbGJ5IivBvlO3Pz",
-        "website": "https://www.facebook.com/p/%E5%8B%BB%E5%87%B1%E8%BE%B2%E5%A0%B4-100063930137730/"
-    },
-    {
-        "planName": "東和泡芙－滿200贈泡芙",
-        "storeName": "東和泡芙(登記名稱：鼎添食品有限公司)",
-        "offerTitle": "單筆消費結帳金額滿200元，贈送手工泡芙一顆(供應之口味，視現場情況而定)",
-        "offerDesc": "單筆消費結帳金額滿200元，贈送手工泡芙一顆(供應之口味，視現場情況而定)",
-        "image": "https://drive.google.com/uc?export=view&id=1-gVJv2RFBtA-Z0kXm4_QbJ_l4gSdegx2",
-        "website": "https://www.facebook.com/YuJianPuffs"
-    },
-    {
-        "planName": "北京王餡餅－滿200送20",
-        "storeName": "北京王餡餅",
-        "offerTitle": "餡餅滿200送20，冷凍餡餅滿500送保冷袋。",
-        "offerDesc": "餡餅滿200送20，冷凍餡餅滿500送保冷袋。",
-        "image": "https://drive.google.com/uc?export=view&id=1ufVXAOGE4yU6gJMqxDpKmTwkAiK1VUa1",
-        "website": "https://bjwang.my1shop.com/79pu53"
-    },
-    {
-        "planName": "阿國師雲蒸薑母鴨－第二件半價",
-        "storeName": "阿國師雲蒸薑母鴨",
-        "offerTitle": "甕蒸薑母鴨/菌菇九尾雞（即食包）原價249元 第二件半價",
-        "offerDesc": "甕蒸薑母鴨/菌菇九尾雞（即食包）原價249元 第二件半價",
-        "image": "https://drive.google.com/uc?export=view&id=1h0ATBB0jneZqx9Yzvyzitjecpq2piCIt",
-        "website": "https://www.ys1985.com.tw/"
-    },
-    {
-        "planName": "干嘛喝茶－第二杯半價",
-        "storeName": "干嘛喝茶",
-        "offerTitle": "仙草干茶與原味茶飲系列第二杯半價",
-        "offerDesc": "仙草干茶與原味茶飲系列第二杯半價",
-        "image": "https://drive.google.com/uc?export=view&id=12U_3w8Qk1eXcKZEx0i45WUxex3pmCjD6",
-        "website": "https://www.facebook.com/profile.php?id=100066407750999"
-    },
-    {
-        "planName": "有點小物工作室－畫室體驗",
-        "storeName": "有點小物工作室",
-        "offerTitle": "【幸福的提筆畫室】免費體驗乙次",
-        "offerDesc": "小物限定寫生租借服務-【幸福的提筆畫室】免費體驗乙次\n#預約制 #無現場教學 #自由寫生 #畫具租借\n請於報名表單上備註「集點樂兌換」",
-        "image": "https://drive.google.com/uc?export=view&id=1OUhuBPGVXBcxHJQU-h8YfH_X24OwI8us",
-        "website": "https://www.instagram.com/littlethingsworkroom/?__pwa=1"
-    },
-    {
-        "planName": "第一鰻波－胭脂鰻組合",
-        "storeName": "第一鰻波",
-        "offerTitle": "第一鰻波-胭脂鰻(125gx6)1700元，送限量摺疊袋一只",
-        "offerDesc": "胭脂鰻(125gx6)1700元，送限量摺疊袋一只",
-        "image": "https://drive.google.com/uc?export=view&id=1BA4XBm-j_CsXvQ3DELk-IejIOPz20y1C",
-        "website": "https://www.firstmanpower.tw/"
-    },
-    {
-        "planName": "成龍捌貳問路站－送鑰匙圈",
-        "storeName": "成龍捌貳－成龍溼地社區問路站",
-        "offerTitle": "來店消費一份飲品加點心，送成龍溼地鑰匙圈一個",
-        "offerDesc": "來店消費一份飲品加點心，送成龍溼地鑰匙圈一個",
-        "image": "https://drive.google.com/uc?export=view&id=1TVynLMBXC3VCtMCTaDKo-dCeSbhYDExL",
-        "website": "https://portaly.cc/lamstudio"
-    },
-    {
-        "planName": "玉山碾米－買五送一",
-        "storeName": "玉山碾米",
-        "offerTitle": "指定商品買五送一",
-        "offerDesc": "指定商品買五送一",
-        "image": "https://drive.google.com/uc?export=view&id=1sdw2LbQ9KEJjmxYetv6EAK5ML7XO9Pv3",
-        "website": "https://esunrice.com/"
-    },
-    {
-        "planName": "萬源製麵舖－全產品95折",
-        "storeName": "萬源製麵舖",
-        "offerTitle": "全產品95折",
-        "offerDesc": "全產品95折",
-        "image": "https://drive.google.com/uc?export=view&id=1EyjmA7CpNlF_cO-ev5GoIjw9na06pKmE",
-        "website": "https://www.1931.com.tw"
-    }
-];
+  let MERCHANTS = [];
 
 /* ============================================================
    以下為頁面邏輯，一般不需要修改
@@ -498,10 +352,19 @@
         </div>
         <div class="perforation"></div>
         <div class="ticket-body">
+          ${m.address || m.phone || m.hours ? `
+          <div class="store-meta">
+            ${m.address ? `<div><span class="meta-label">地址</span><span>${m.address}</span></div>` : ''}
+            ${m.phone ? `<div><span class="meta-label">電話</span><span>${m.phone}</span></div>` : ''}
+            ${m.hours ? `<div><span class="meta-label">營業時間</span><span>${m.hours}</span></div>` : ''}
+          </div>` : ''}
+          ${m.storeIntro ? `<p class="store-intro">${m.storeIntro}</p>` : ''}
+          ${m.gallery && m.gallery.length ? `<div class="gallery">${m.gallery.map(src => `<img src="${src}" onerror="this.style.display='none'">`).join('')}</div>` : ''}
           <div class="offer-label">優惠方案</div>
           <div class="offer-title">${m.offerTitle}</div>
           <p class="offer-desc">${m.offerDesc}</p>
           ${hasWebsite ? `<a class="website-link" href="${m.website}" target="_blank" rel="noopener">查看商家更多資訊 →</a>` : ''}
+          <div class="usage-notice">⚠️ 本連結為您的專屬兌換連結，僅限本人使用，且限兌換一次，請勿轉發他人。</div>
           <button class="primary" id="btn-redeem">兌換優惠</button>
         </div>
       </div>
@@ -616,7 +479,28 @@
     `;
   }
 
-  (function init(){
+  root.innerHTML = `<div class="not-found"><div class="icon">⏳</div><h2>載入中</h2><p>正在載入商家資料，請稍候...</p></div>`;
+
+  fetch('merchants.json')
+    .then(res => {
+      if(!res.ok) throw new Error('merchants.json 讀取失敗');
+      return res.json();
+    })
+    .then(data => {
+      MERCHANTS = data;
+      init();
+    })
+    .catch(() => {
+      root.innerHTML = `
+        <div class="not-found">
+          <div class="icon">⚠️</div>
+          <h2>商家資料載入失敗</h2>
+          <p>請確認 merchants.json 是否與本頁面放在同一個資料夾，或聯繫活動小組協助確認：king323277@gmail.com</p>
+        </div>
+      `;
+    });
+
+  function init(){
     const plan = getQueryPlan();
     const merchant = findMerchant(plan);
     if(!merchant){
@@ -635,7 +519,7 @@
         renderOffer(merchant);
       }
     });
-  })();
+  }
 </script>
 
 </body>
